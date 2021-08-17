@@ -3,6 +3,7 @@ package pl.pilichm.weatherapp
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.app.Dialog
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -20,9 +21,13 @@ import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
+import pl.pilichm.weatherapp.models.WeatherResponse
+import pl.pilichm.weatherapp.network.WeatherService
+import retrofit.*
 
 class MainActivity : AppCompatActivity() {
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
+    private var mProgressDialog: Dialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,7 +75,7 @@ class MainActivity : AppCompatActivity() {
                 .check()
         }
 
-        getLocationWeatherDetails()
+        getLocationWeatherDetails(52.21, 21.03)
     }
 
     private fun isLocationEnabled(): Boolean {
@@ -125,15 +130,64 @@ class MainActivity : AppCompatActivity() {
             val longitude = mLastLocation.longitude
             Log.i("Current Longitude", "$longitude")
 
-            getLocationWeatherDetails()
+            getLocationWeatherDetails(52.21, 21.03)
         }
     }
 
-    private fun getLocationWeatherDetails(){
+    private fun getLocationWeatherDetails(latitude: Double, longitude: Double){
         if (Constants.isNetworkAvailable(this)){
-            Toast.makeText(this, "Connection ok", Toast.LENGTH_SHORT).show()
+            val retrofit: Retrofit = Retrofit.Builder()
+                .baseUrl(Constants.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+
+            val service: WeatherService = retrofit
+                .create(WeatherService::class.java)
+
+            val listCall: Call<WeatherResponse> = service.getWeather(
+                latitude, longitude, Constants.METRIC_UNIT, Constants.APP_ID
+            )
+
+            showProgressDialog()
+
+            listCall.enqueue(object: Callback<WeatherResponse>{
+                override fun onResponse(response: Response<WeatherResponse>?, retrofit: Retrofit?) {
+                    if (response!!.isSuccess){
+                        hideProgressDialog()
+                        val weatherList: WeatherResponse = response.body()
+                        Log.i("RESPONSE", "$weatherList")
+                    } else {
+                        hideProgressDialog()
+                        when (response.code()){
+                            400 -> Log.e("Error 400", "Bad connection")
+                            404 -> Log.e("Error 400", "Not found")
+                            else -> Log.e("Error", "General error")
+                        }
+                    }
+                }
+
+                override fun onFailure(t: Throwable?) {
+                    hideProgressDialog()
+                    Log.e("Call failure", t!!.message.toString())
+                }
+
+            })
+
         } else {
             Toast.makeText(this, "Connection nok", Toast.LENGTH_SHORT).show()
         }
     }
+
+    private fun showProgressDialog(){
+        mProgressDialog = Dialog(this)
+        mProgressDialog!!.setContentView(R.layout.dialog_progress)
+        mProgressDialog!!.show()
+    }
+
+    private fun hideProgressDialog(){
+        if (mProgressDialog!=null){
+            mProgressDialog!!.dismiss()
+        }
+    }
+
 }
