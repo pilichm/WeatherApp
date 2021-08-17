@@ -13,7 +13,6 @@ import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
 import android.util.Log
-import android.webkit.PermissionRequest
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.location.*
@@ -70,6 +69,8 @@ class MainActivity : AppCompatActivity() {
                 }).onSameThread()
                 .check()
         }
+
+        getLocationWeatherDetails()
     }
 
     private fun isLocationEnabled(): Boolean {
@@ -123,6 +124,16 @@ class MainActivity : AppCompatActivity() {
 
             val longitude = mLastLocation.longitude
             Log.i("Current Longitude", "$longitude")
+
+            getLocationWeatherDetails()
+        }
+    }
+
+    private fun getLocationWeatherDetails(){
+        if (Constants.isNetworkAvailable(this)){
+            Toast.makeText(this, "Connection ok", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this, "Connection nok", Toast.LENGTH_SHORT).show()
         }
     }
 }
