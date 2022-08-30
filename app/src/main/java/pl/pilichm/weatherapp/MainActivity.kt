@@ -26,7 +26,7 @@ import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
-import kotlinx.android.synthetic.main.activity_main.*
+import pl.pilichm.weatherapp.databinding.ActivityMainBinding
 import pl.pilichm.weatherapp.models.WeatherResponse
 import pl.pilichm.weatherapp.network.WeatherService
 import retrofit.*
@@ -34,13 +34,15 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
     private var mProgressDialog: Dialog? = null
     private lateinit var mSharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         mSharedPreferences = getSharedPreferences(Constants.PREFERENCE_NAME, Context.MODE_PRIVATE)
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -216,38 +218,38 @@ class MainActivity : AppCompatActivity() {
             for (i in weatherList.weather.indices){
                 Log.i("Weather for UI", weatherList.weather.toString())
 
-                tvMain.text = weatherList.weather[i].main
-                tvMainDescription.text = weatherList.weather[i].description
+                binding.tvMain.text = weatherList.weather[i].main
+                binding.tvMainDescription.text = weatherList.weather[i].description
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    tvTep.text = weatherList.main.temp.toString() + getUnit(application.resources.configuration.locales.toString())
+                    binding.tvTep.text = weatherList.main.temp.toString() + getUnit(application.resources.configuration.locales.toString())
                 } else {
-                    tvTep.text = weatherList.main.temp.toString()
+                    binding.tvTep.text = weatherList.main.temp.toString()
                 }
 
-                tvSunriseTime.text = unixTime(weatherList.sys.sunrise)
-                tvSunsetTime.text = unixTime(weatherList.sys.sunset)
-                tvHumidity.text = weatherList.main.humidity.toString() + " per cent"
-                tvMin.text = weatherList.main.temp_min.toString() + " min"
-                tvMax.text = weatherList.main.temp_max.toString() + " max"
-                tvSpeed.text = weatherList.wind.speed.toString()
-                tvName.text = weatherList.name
-                tvCountry.text = weatherList.sys.country
+                binding.tvSunriseTime.text = unixTime(weatherList.sys.sunrise)
+                binding.tvSunsetTime.text = unixTime(weatherList.sys.sunset)
+                binding.tvHumidity.text = weatherList.main.humidity.toString() + " per cent"
+                binding.tvMin.text = weatherList.main.temp_min.toString() + " min"
+                binding.tvMax.text = weatherList.main.temp_max.toString() + " max"
+                binding.tvSpeed.text = weatherList.wind.speed.toString()
+                binding.tvName.text = weatherList.name
+                binding.tvCountry.text = weatherList.sys.country
 
                 when (weatherList.weather[i].icon){
-                    "01d" -> ivMain.setImageResource(R.drawable.sunny)
-                    "02d" -> ivMain.setImageResource(R.drawable.cloud)
-                    "03d" -> ivMain.setImageResource(R.drawable.cloud)
-                    "04d" -> ivMain.setImageResource(R.drawable.cloud)
-                    "04n" -> ivMain.setImageResource(R.drawable.cloud)
-                    "10d" -> ivMain.setImageResource(R.drawable.rain)
-                    "11d" -> ivMain.setImageResource(R.drawable.storm)
-                    "13d" -> ivMain.setImageResource(R.drawable.snowflake)
-                    "01n" -> ivMain.setImageResource(R.drawable.cloud)
-                    "02n" -> ivMain.setImageResource(R.drawable.cloud)
-                    "03n" -> ivMain.setImageResource(R.drawable.cloud)
-                    "10n" -> ivMain.setImageResource(R.drawable.cloud)
-                    "11n" -> ivMain.setImageResource(R.drawable.rain)
-                    "13n" -> ivMain.setImageResource(R.drawable.snowflake)
+                    "01d" -> binding.ivMain.setImageResource(R.drawable.sunny)
+                    "02d" -> binding.ivMain.setImageResource(R.drawable.cloud)
+                    "03d" -> binding.ivMain.setImageResource(R.drawable.cloud)
+                    "04d" -> binding.ivMain.setImageResource(R.drawable.cloud)
+                    "04n" -> binding.ivMain.setImageResource(R.drawable.cloud)
+                    "10d" -> binding.ivMain.setImageResource(R.drawable.rain)
+                    "11d" -> binding.ivMain.setImageResource(R.drawable.storm)
+                    "13d" -> binding.ivMain.setImageResource(R.drawable.snowflake)
+                    "01n" -> binding.ivMain.setImageResource(R.drawable.cloud)
+                    "02n" -> binding.ivMain.setImageResource(R.drawable.cloud)
+                    "03n" -> binding.ivMain.setImageResource(R.drawable.cloud)
+                    "10n" -> binding.ivMain.setImageResource(R.drawable.cloud)
+                    "11n" -> binding.ivMain.setImageResource(R.drawable.rain)
+                    "13n" -> binding.ivMain.setImageResource(R.drawable.snowflake)
                 }
             }
         }
