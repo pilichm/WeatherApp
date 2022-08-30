@@ -7,7 +7,8 @@ Used technologies:
 - models for data from https://home.openweathermap.org/,
 - call to api https://home.openweathermap.org/,
 - progress dialog,
-- shared preferences for storing last downloaded data to use when there is no internet connection.
+- shared preferences for storing last downloaded data to use when there is no internet connection,
+- finding views from layout with view binding.
 
 App during work:
 <br>
